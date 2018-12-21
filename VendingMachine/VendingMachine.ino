@@ -28,6 +28,12 @@
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 
+#define CHOICE1   "A"
+#define CHOICE2   "B"
+#define CHOICE3   "C"
+#define CHOICE4   "D"
+
+#define SERVODELAY 5000
 
 // Constants
 Servo servo1;
@@ -58,69 +64,35 @@ void setup()
   tft.begin(0x9341);
   tft.setRotation(3);
 
-  
-  tft.fillScreen(BLACK);
+  clear_LCD();
 
-  //Draw white frame
-  tft.drawRect(0,0,319,240,WHITE);
-  
-  //Print "Hello" Text
-  tft.setCursor(100,30);
-  tft.setTextColor(WHITE);
-  tft.setTextSize(4);
-  tft.print("Hello");
-  
-  //Print "YouTube!" text 
-  tft.setCursor(80,100);
-  tft.setTextColor(RED);
-  tft.setTextSize(4);
-  tft.print("YouTube!");
-  
-  //Create Red Button
-  tft.fillRect(60,180, 200, 40, RED);
-  tft.drawRect(60,180,200,40,WHITE);
-  tft.setCursor(80,188);
+  tft.setCursor(30,30);
   tft.setTextColor(WHITE);
   tft.setTextSize(3);
-  tft.print("Subscribe!");
+  tft.print("Vending Machine");
+  
+  tft.setCursor(20,90);
+  tft.setTextColor(RED);
+  tft.setTextSize(3);
+  tft.print("@NickySlicksHaha");
+  
+  //Create Red Button
+  tft.fillRect(40,180, 235, 40, RED);
+  tft.drawRect(40,180,235,40,WHITE);
+  tft.setCursor(55,188);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(3);
+  tft.print("Subscribe :)");
+
+  delay(2000);
+  waitingForCredit();
+  updateCredits();
 
 } 
 
 // Main loop
 void loop() 
 {
-  TSPoint p = ts.getPoint();  //Get touch point
-  
-  if (p.z > ts.pressureThreshhold) {
-
-   Serial.print("X = "); Serial.print(p.x);
-   Serial.print("\tY = "); Serial.print(p.y);
-   Serial.print("\n");
-   
-   p.x = map(p.x, TS_MAXX, TS_MINX, 0, 320);
-   p.y = map(p.y, TS_MAXY, TS_MINY, 0, 240);
-       
-   if(p.x>60 && p.x<260 && p.y>180 && p.y<220 && buttonEnabled)// The user has pressed inside the red rectangle
-   {
-    buttonEnabled = false; //Disable button
-        
-    //This is important, because the libraries are sharing pins
-   pinMode(XM, OUTPUT);
-   pinMode(YP, OUTPUT);
-    
-    //Erase the screen
-    tft.fillScreen(BLACK);
-    
-    //Draw frame
-    tft.drawRect(0,0,319,240,WHITE);
-    
-    tft.setCursor(50,50);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(3);
-    tft.print("Thank you for\n\n   subscribing!");
-   }
-   delay(10);  
-  }
   // If we've hit our target amount of coins, increment our credits and reset the cents counter
   if (cents >= targetcents) {
     credits = credits + 1;
@@ -133,42 +105,191 @@ void loop()
 
   // Now, write your own cool code here that triggers an event when the player has credits!
   if (credits > 0) {
-      Servo1();
-      Servo2();
-      Servo3();
-      Servo4();
-      credits = 0; 
+      drawChoices();
+      findButton();
+      reset(); 
   }
+  delay(1000);
+}
 
+void reset(){
+  credits=0;
+  waitingForCredit();
+  buttonEnabled=true;
+  updateCredits();  
+}
+void findButton(){
+  while(1){
+    TSPoint p = ts.getPoint();  //Get touch point
+    if (p.z > ts.pressureThreshhold) {
+ 
+     p.x = map(p.x, TS_MAXX, TS_MINX, 0, 320);
+     p.y = map(p.y, TS_MAXY, TS_MINY, 0, 240);
+         
+     if(p.x>10 && p.x<145 && p.y>80 && p.y<140 && buttonEnabled)// The user has pressed inside the red rectangle
+     {
+      buttonEnabled = false; //Disable button
+          
+      //This is important, because the libraries are sharing pins
+      pinMode(XM, OUTPUT);
+      pinMode(YP, OUTPUT);
+      clear_LCD();      
+      thanks();
+      Servo1();
+      break;
+     }
+
+     if(p.x>175 && p.x<310 && p.y>80 && p.y<140 && buttonEnabled)// The user has pressed inside the red rectangle
+     {
+      buttonEnabled = false; //Disable button
+          
+      //This is important, because the libraries are sharing pins
+      pinMode(XM, OUTPUT);
+      pinMode(YP, OUTPUT);
+      
+      clear_LCD();      
+      thanks();
+      Servo2();
+      break;
+     }
+
+     if(p.x>10 && p.x<145 && p.y>160 && p.y<220 && buttonEnabled)// The user has pressed inside the red rectangle
+     {
+      buttonEnabled = false; //Disable button
+          
+      //This is important, because the libraries are sharing pins
+      pinMode(XM, OUTPUT);
+      pinMode(YP, OUTPUT);  
+      clear_LCD();      
+      thanks();
+      Servo3();
+      break;
+     }
+
+     if(p.x>175 && p.x<310 && p.y>160 && p.y<220 && buttonEnabled)// The user has pressed inside the red rectangle
+     {
+      buttonEnabled = false; //Disable button
+          
+      //This is important, because the libraries are sharing pins
+      pinMode(XM, OUTPUT);
+      pinMode(YP, OUTPUT);
+      clear_LCD();      
+      thanks();
+      Servo4();
+      break;
+     }
+     delay(10);  
+    }
+  }
+}
+void clear_LCD(){
+    //Erase the screen
+    tft.fillScreen(BLACK);      
+    //Draw frame
+    tft.drawRect(0,0,319,240,WHITE);
+}
+void thanks(){
+    tft.setCursor(80,80);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(3);
+    tft.print("THANKS!");
 }
 // Activate Servo 1
 void Servo1(){
       servo1.attach(45);
-      delay(3000);
+      delay(SERVODELAY);
       servo1.detach();  
 }
 // Activate Servo 2
 void Servo2(){
       servo2.attach(46);
-      delay(3000);
+      delay(SERVODELAY);
       servo2.detach();  
 }
 // Activate Servo 3
 void Servo3(){
       servo3.attach(50);
-      delay(3000);  
+      delay(SERVODELAY);  
       servo3.detach();
 }
 // Activate Servo 4
 void Servo4(){
       servo4.attach(52);
-      delay(3000);
+      delay(SERVODELAY);
       servo4.detach();  
 }
 // Interrupt
-void coinInterrupt(){
-  
+void coinInterrupt(){ 
   // Each time a pulse is sent from the coin acceptor, interrupt main loop to add 1 cent and flip on the LED
   cents = cents + 1;
-  
+  updateCredits(); 
+}
+
+void waitingForCredit(){
+  clear_LCD();
+
+  tft.setCursor(50,40);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(3);
+  tft.print("Insert $0.50");
+  tft.setCursor(95,90);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(3);
+  tft.print("Credit:");
+}
+
+void updateCredits(){
+  //Create Red Button
+  tft.fillRect(70,140, 155, 40, RED);
+  tft.drawRect(70,140,155,40,WHITE);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(3);
+  if(cents == 0){
+    tft.setCursor(105,148);
+    tft.print("$0.00");
+  }
+  else{
+    tft.setCursor(105,148);
+    tft.print("$0.");
+    tft.setCursor(160,148);
+    tft.print(cents);
+  }
+}
+
+void drawChoices(){
+      clear_LCD();
+    
+      // Title
+      tft.setCursor(60,20);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(3);
+      tft.print("Credits: 1");
+      
+      tft.fillRect(10,80,135, 60, RED);
+      tft.drawRect(10,80,135,60,WHITE);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(3);
+      tft.setCursor(70,95);
+      tft.print(CHOICE1);
+
+      tft.fillRect(175,80,135, 60, RED);
+      tft.drawRect(175,80,135,60,WHITE);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(3);
+      tft.setCursor(235,95);
+      tft.print(CHOICE2);
+
+      tft.fillRect(10,160,135, 60, RED);
+      tft.drawRect(10,160,135,60,WHITE);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(3);
+      tft.setCursor(70,175);
+      tft.print(CHOICE3);
+
+      tft.fillRect(175,160,135, 60, RED);
+      tft.drawRect(175,160,135,60,WHITE);
+      tft.setTextColor(WHITE);
+      tft.setTextSize(3);
+      tft.setCursor(235,175);
+      tft.print(CHOICE4);
 }
