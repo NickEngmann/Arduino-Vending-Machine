@@ -11,8 +11,8 @@ https://channel9.msdn.com/Shows/themakershow/10/
 
 LCD:
 
-📥 Install the Modified Adafruit TFTLCD code.
+📥 [Modified Adafruit TFTLCD code](https://github.com/NickEngmann/Arduino-Vending-Machine/blob/master/Adafruit_TFTLCD.zip)
 
-📥 Adafruit GFX: https://github.com/adafruit/Adafruit-GFX-Library
+📥 [Adafruit GFX](https://github.com/adafruit/Adafruit-GFX-Library)
 
-📥 Touchscreen: https://github.com/adafruit/Touch-Screen-Library
+📥 [Touchscreen](https://github.com/adafruit/Touch-Screen-Library)
